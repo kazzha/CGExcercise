@@ -11,7 +11,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance,
     // &gpD2DFactory 반환할 값. 포인터 포인터 형식
 
     try{
-    D2DFramework  myFramework;
+    BitmapExample myFramework;
 
     
     myFramework.Initialize(hInstance, L"Framework", 1024, 768);
