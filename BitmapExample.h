@@ -25,6 +25,8 @@ public:
 
 	void DrawPixel(int x, int y, D2D1::ColorF color);
 	void DrawRectangle(int left, int top, int w, int h, D2D1::ColorF color);
+	void DrawCircle(int x, int y, int r, D2D1::ColorF color);
+	void DrawLine(int x, int y, int x2, int y2, D2D1::ColorF color);
 	void ClearBuffer(D2D1::ColorF color);
 
 	void PresentBuffer();

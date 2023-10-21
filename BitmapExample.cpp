@@ -1,4 +1,7 @@
 #include "BitmapExample.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <cmath>
 
 HRESULT BitmapExample::CreateDeviceResources()
 {
@@ -30,7 +33,10 @@ void BitmapExample::Render()
     mspRenderTarget->Clear(D2D1::ColorF(0.0f, 0.2f, 0.4f, 1.0f));
 
     ClearBuffer(D2D1::ColorF(D2D1::ColorF::PapayaWhip));
-    DrawPixel(2,1, D2D1::ColorF::Black);
+    //DrawRectangle(0, 0, 100, 100, D2D1::ColorF::Red);
+    //DrawRectangle(50, 50, 100, 100, D2D1::ColorF(D2D1::ColorF::Gray, 0.7f));
+    //DrawCircle(100, 100, 100, D2D1::ColorF::Red);
+    DrawLine(0, 0, 100, 100, D2D1::ColorF::Red);
     PresentBuffer();
     mspRenderTarget->DrawBitmap(mspFrameBuffer.Get());
 
@@ -47,10 +53,12 @@ void BitmapExample::DrawPixel(int x, int y, D2D1::ColorF color)
     int pitch = BITMAP_WIDTH * BITMAP_BYTECOUNT;
     int i = y * pitch + x * BITMAP_BYTECOUNT;
 
-    mspBackBuffer[i] = static_cast<UINT8>(color.r * 255);
-    mspBackBuffer[i+1] = static_cast<UINT8>(color.g * 255);
-    mspBackBuffer[i+2] = static_cast<UINT8>(color.b * 255);
-    mspBackBuffer[i+3] = static_cast<UINT8>(color.a * 255);
+    float inverse = 1.0f - color.a;
+
+    mspBackBuffer[i] = static_cast<UINT8>(mspBackBuffer[i]* inverse + static_cast<UINT8>(color.r * 255 * color.a));
+    mspBackBuffer[i+1] = static_cast<UINT8>(mspBackBuffer[i+1] * inverse + static_cast<UINT8>(color.g * 255 * color.a));
+    mspBackBuffer[i+2] = static_cast<UINT8>(mspBackBuffer[i+2] * inverse + static_cast<UINT8>(color.b * 255 * color.a));
+    mspBackBuffer[i+3] = static_cast<UINT8> (mspBackBuffer[i+3] * inverse + static_cast<UINT8>(color.a * 255 * color.a));
 }
 
 void BitmapExample::DrawRectangle(int left, int top, int w, int h, D2D1::ColorF color)
@@ -63,6 +71,57 @@ void BitmapExample::DrawRectangle(int left, int top, int w, int h, D2D1::ColorF 
         }
     }
 }
+
+void BitmapExample::DrawCircle(int x, int y, int r, D2D1::ColorF color)
+{
+    double degree{}, radian{};
+    for (int i = 0; i < 360; i++)
+    {
+        radian = degree * M_PI / 180;
+        DrawPixel(x + cos(radian) * r, y + sin(radian) * r, color);
+        degree++;
+    }
+}
+
+void BitmapExample::DrawLine(int x, int y, int x2, int y2, D2D1::ColorF color)
+{
+    double tmp{};
+    if( x == x2) 
+    {
+        double maxY = max(y, y2);
+        double minY = min(y, y2);
+        while (minY != maxY)
+        {
+            DrawPixel(x, minY, color); 
+            minY += 0.1;
+        }
+    }
+    else if (y == y2)
+    {
+        double maxX = max(x, x2);
+        double minX = min(x, x2);
+        while (minX != maxX)
+        {
+            DrawPixel(minX, y, color);
+            minX += 0.1;
+        }
+    }
+    else {
+        double m = (y - y2) / (x - x2);
+        double a = y - m * x;
+
+        double maxX = max(x, x2);
+        double minX = min(x, x2);
+        while (minX != maxX)
+        {
+            tmp = m * minX + a;
+            DrawPixel(minX, tmp, color);
+            minX += 0.1;
+        }
+    }
+}
+
+
 
 void BitmapExample::ClearBuffer(D2D1::ColorF color)
 {
