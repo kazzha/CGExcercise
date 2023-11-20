@@ -83,43 +83,95 @@ void BitmapExample::DrawCircle(int x, int y, int r, D2D1::ColorF color)
     }
 }
 
-void BitmapExample::DrawLine(int x, int y, int x2, int y2, D2D1::ColorF color)
+void BitmapExample::DrawLine(int x1, int y1, int x2, int y2, D2D1::ColorF color)
 {
-    double tmp{};
-    if( x == x2) 
-    {
-        double maxY = max(y, y2);
-        double minY = min(y, y2);
-        while (minY != maxY)
-        {
-            DrawPixel(x, minY, color); 
-            minY += 0.1;
-        }
-    }
-    else if (y == y2)
-    {
-        double maxX = max(x, x2);
-        double minX = min(x, x2);
-        while (minX != maxX)
-        {
-            DrawPixel(minX, y, color);
-            minX += 0.1;
-        }
-    }
-    else {
-        double m = (y - y2) / (x - x2);
-        double a = y - m * x;
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+    int maxY = max(y1, y2);
+    int minY = min(y1, y2);
 
-        double maxX = max(x, x2);
-        double minX = min(x, x2);
-        while (minX != maxX)
+    if (dx == 0)
+    {
+        if (dy > 0)
         {
-            tmp = m * minX + a;
-            DrawPixel(minX, tmp, color);
-            minX += 0.1;
+            for (int i = y1; i != y2; i++)
+            {
+                DrawPixel(x1, i, color);
+            }
+        }
+        else if (dy < 0)
+        {
+            for (int i = y1; i != y2; i--)
+            {
+                DrawPixel(x1, i, color);
+            }
         }
     }
-}
+    else if (dy == 0)
+    {
+        if (dx > 0)
+        {
+            for (int i = x1; i != x2; i++)
+            {
+                DrawPixel(i, y1, color);
+            }
+        }
+        else if (dx < 0)
+        {
+            for (int i = x1; i != x2; i--)
+            {
+                DrawPixel(i, y1, color);
+            }
+        }
+    }
+
+    else
+    {
+        float m = static_cast<float>(dy) / dx;
+        float y{};
+        if (m > 0)
+        {
+            if (dx < 0)
+            {
+                for (int i = x1; i != x2; i--)
+                {
+                    y = m * (i - x1) + (float)y1;
+                    DrawPixel(i, y, color);
+                }
+            }
+            else if (dx > 0)
+            {
+                for (int i = x1; i != x2; i++)
+                {
+                    y = m * (i - x1) + (float)y1;
+                    DrawPixel(i, y, color);
+                }
+            }
+        }
+        else if (m < 0)
+        {
+            if (dx < 0)
+            {
+                for (int i = x1; i != x2; i--)
+                {
+                    y = m * (i - x1) + (float)y1;
+                    DrawPixel(i, y, color);
+                }
+            }
+            else if (dx > 0)
+            {
+                for (int i = x1; i != x2; i++)
+                {
+                    y = m * (i - x1) + (float)y1;
+                    DrawPixel(i, y, color);
+                }
+            }
+        }
+    }
+
+    }
+   
+   
 
 
 
